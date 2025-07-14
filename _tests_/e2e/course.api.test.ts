@@ -20,7 +20,7 @@ describe('/course', () => {
             .expect(HTTP_STATUSES.NOT_FOUND_404)
     })
 
-    it('should not create course with incorrect input data', async () => {
+    it('should NOT create course with incorrect input data', async () => {
         await request(app)
             .post('/courses')
             .send({title: ''})
@@ -32,13 +32,15 @@ describe('/course', () => {
 
     })
 
+    let createdCourse:any = null;
+
     it('should create course with correct input data', async () => {
         const createResponse = await request(app)
             .post('/courses')
             .send({title: 'NewTitle'})
             .expect(HTTP_STATUSES.CREATED_201)
 
-        const createdCourse = createResponse.body;
+         createdCourse = createResponse.body;
 
         expect(createdCourse).toEqual({
             id: expect.any(Number),
@@ -50,5 +52,38 @@ describe('/course', () => {
             .expect(HTTP_STATUSES.OK_200, [createdCourse])
     })
 
+    it('should NOT update course with incorrect input data', async () => {
+       await request(app)
+            .put('/courses/' + createdCourse.id)
+            .send({title: ''})
+            .expect(HTTP_STATUSES.BAD_REQUEST_400)
+
+        await request(app)
+            .get('/courses')
+            .expect(HTTP_STATUSES.OK_200, createdCourse)
+    })
+
+    it('should NOT update course that not exist', async () => {
+        await request(app)
+            .put('/courses/' + -100)
+            .send({title: 'good title'})
+            .expect(HTTP_STATUSES.NOT_FOUND_404)
+    })
+
+    it('should update course with correct input data', async () => {
+        await request(app)
+            .put('/courses/' + createdCourse.id)
+            .send({title: 'good new title'})
+            .expect(HTTP_STATUSES.NO_CONTENT_204)
+
+        await request(app)
+            .get('/courses' + createdCourse.id)
+            .expect(HTTP_STATUSES.OK_200, {
+                ...createdCourse,
+            title: 'good new title'})
+    })
+
+
 
 })
+//it-incubator course
