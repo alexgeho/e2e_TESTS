@@ -92,20 +92,30 @@ describe('/course', () => {
             .expect(HTTP_STATUSES.NOT_FOUND_404)
     })
 
+
+    let createdCourse3:any = null;
+
     it('should update course with correct input data', async () => {
+        const createResponse = await request(app)
+            .post('/courses/')
+            .send({title: 'good title3'})
+            .expect(HTTP_STATUSES.CREATED_201)
+
+        createdCourse3 = createResponse.body;
+
         await request(app)
-            .put('/courses/' + createdCourse1.id)
+            .put('/courses/' + createdCourse3.id)
             .send({title: 'good new title'})
             .expect(HTTP_STATUSES.NO_CONTENT_204)
 
         await request(app)
-            .get('/courses/' + createdCourse1.id)
+            .get('/courses/' + createdCourse3.id)
             .expect(HTTP_STATUSES.OK_200, {
-                ...createdCourse1,
+                ...createdCourse3,
             title: 'good new title'})
 
         await request(app)
-            .get('/courses/' + createdCourse1.id)
+            .get('/courses/' + createdCourse3.id)
             .expect(HTTP_STATUSES.OK_200, createdCourse2)
 
     })
