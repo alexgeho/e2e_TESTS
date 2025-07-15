@@ -1,8 +1,11 @@
 import request from 'supertest';
-import {app} from '../../src/index';
-import {RouterPaths} from "../../src/app";
+import {app, RouterPaths} from "../../src/app";
 import {HTTP_STATUSES} from "../../src/utils";
-//import { db } from '../../src/index';
+import {CreateUserModel} from "../../src/features/users/models/CreateUserModel";
+
+const getRequest = () => {
+    return request(app)
+}
 
 describe('tests for /users', () => {
 
@@ -11,22 +14,25 @@ describe('tests for /users', () => {
     })
 
 
+
     it('should return 200 and empty array', async () => {
         await request(app)
             .get(RouterPaths.users)
             .expect(HTTP_STATUSES.OK_200, [])
     })
 
-    it('should return 404 for not existing course', async () => {
+    it('should return 404 for not existing entity', async () => {
         await request(app)
             .get(`${RouterPaths.users}/1`)
             .expect(HTTP_STATUSES.NOT_FOUND_404)
     })
 
     it('should NOT create course with incorrect input data', async () => {
+
+
         await request(app)
             .post(RouterPaths.users)
-            .send({title: ''})
+            .send({userName: ''})
             .expect(HTTP_STATUSES.BAD_REQUEST_400)
 
         await request(app)
@@ -35,101 +41,101 @@ describe('tests for /users', () => {
 
     })
 
-    let createdCourse1:any = null;
+    let createdEntity1:any = null;
 
-    it('should create course with correct input data', async () => {
+    it('should create entity with correct input data', async () => {
         const createResponse = await request(app)
             .post(RouterPaths.users)
-            .send({title: 'NewTitle'})
+            .send({userName: 'NewTitle'})
             .expect(HTTP_STATUSES.CREATED_201)
 
-        createdCourse1 = createResponse.body;
-        console.log('createdCourse1:', createdCourse1); // <-- Добавь сюда
+        createdEntity1 = createResponse.body;
+        console.log('createdEntity1:', createdEntity1); // <-- Добавь сюда
 
-        expect(createdCourse1).toEqual({
+        expect(createdEntity1).toEqual({
             id: expect.any(Number),
-            title: 'NewTitle'
+            userName: 'NewTitle'
         })
 
         await request(app)
             .get(RouterPaths.users)
-            .expect(HTTP_STATUSES.OK_200, [createdCourse1])})
+            .expect(HTTP_STATUSES.OK_200, [createdEntity1])})
 
-    let createdCourse2:any = null;
+    let createdEntity2:any = null;
 
-    it('create one more course', async () => {
+    it('create one more entity', async () => {
 
         const createResponse1 = await request(app)
             .post(RouterPaths.users)
-            .send({title: 'NewTitle'})
+            .send({userName: 'NewTitle'})
             .expect(HTTP_STATUSES.CREATED_201);
-        const createdCourse1 = createResponse1.body;
+        const createdEntity1 = createResponse1.body;
 
         const createResponse = await request(app)
             .post(RouterPaths.users)
-            .send({title: 'it-incubator cc2'})
+            .send({userName: 'it-incubator cc2'})
             .expect(HTTP_STATUSES.CREATED_201)
 
-        createdCourse2 = createResponse.body;
+        createdEntity2 = createResponse.body;
 
-        expect(createdCourse2).toEqual({
+        expect(createdEntity2).toEqual({
             id: expect.any(Number),
-            title: 'it-incubator cc2'
+            userName: 'it-incubator cc2'
         })
 
         await request(app)
             .get(RouterPaths.users)
-            .expect(HTTP_STATUSES.OK_200, [createdCourse1, createdCourse2])
+            .expect(HTTP_STATUSES.OK_200, [createdEntity1, createdEntity2])
     })
 
 
 
-    it('should NOT update course with incorrect input data', async () => {
+    it('should NOT update entity with incorrect input data', async () => {
 
         const createResponse = await request(app)
             .post(RouterPaths.users)
-            .send({title: 'it-incubator cc2'})
+            .send({userName: 'it-incubator cc2'})
             .expect(HTTP_STATUSES.CREATED_201)
 
-        createdCourse1 = createResponse.body;
+        createdEntity1 = createResponse.body;
 
         await request(app)
-            .put(`${RouterPaths.users}/${createdCourse1.id}`)
-            .send({title: ''})
+            .put(`${RouterPaths.users}/${createdEntity1.id}`)
+            .send({userName: ''})
             .expect(HTTP_STATUSES.BAD_REQUEST_400)
 
         await request(app)
-            .get(`${RouterPaths.users}/${createdCourse1.id}`)
-            .expect(HTTP_STATUSES.OK_200, createdCourse1)
+            .get(`${RouterPaths.users}/${createdEntity1.id}`)
+            .expect(HTTP_STATUSES.OK_200, createdEntity1)
     })
 
-    it('should NOT update course that not exist', async () => {
+    it('should NOT update entity that not exist', async () => {
         await request(app)
             .put(`${RouterPaths.users}/${ - 100}`)
-            .send({title: 'good title'})
+            .send({userName: 'good title'})
             .expect(HTTP_STATUSES.NOT_FOUND_404)
     })
 
 
-    let createdCourse3:any = null;
+    let createdEntity3:any = null;
 
-    it('should update course with correct input data', async () => {
+    it('should update entity with correct input data', async () => {
         const createResponse = await request(app)
             .post(RouterPaths.users)
             .send({title: 'good title3'})
             .expect(HTTP_STATUSES.CREATED_201);
 
-        createdCourse3 = createResponse.body;
+        createdEntity3 = createResponse.body;
 
         await request(app)
-            .put(`${RouterPaths.users}/${createdCourse3.id}`)
+            .put(`${RouterPaths.users}/${createdEntity3.id}`)
             .send({title: 'good new title'})
             .expect(HTTP_STATUSES.NO_CONTENT_204);
 
         await request(app)
-            .get(`${RouterPaths.users}/${createdCourse3.id}`)
+            .get(`${RouterPaths.users}/${createdEntity3.id}`)
             .expect(HTTP_STATUSES.OK_200, {
-                id: createdCourse3.id,
+                id: createdEntity3.id,
                 title: 'good new title'
             });
     });

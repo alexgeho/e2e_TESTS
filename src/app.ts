@@ -1,5 +1,5 @@
 import express from 'express';
-import {getCoursesRouter} from './routes/courses.router'
+import {getCoursesRouter} from './features/coursers/courses.router'
 import {db} from './db/db'
 
 export const app = express();

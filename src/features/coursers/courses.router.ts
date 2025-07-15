@@ -1,5 +1,5 @@
 import express, {Router} from "express";
-import {CourseType, db, DBType} from "../db/db";
+import {CourseType, db, DBType} from "../../db/db";
 
 
 export const getCourseViewModel
