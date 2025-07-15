@@ -32,7 +32,7 @@ describe('/course', () => {
 
     })
 
-    let createdCourse:any = null;
+    let createdCourse1:any = null;
 
     it('should create course with correct input data', async () => {
         const createResponse = await request(app)
@@ -40,27 +40,49 @@ describe('/course', () => {
             .send({title: 'NewTitle'})
             .expect(HTTP_STATUSES.CREATED_201)
 
-         createdCourse = createResponse.body;
+         createdCourse1 = createResponse.body;
+        console.log('createdCourse1:', createdCourse1); // <-- Добавь сюда
 
-        expect(createdCourse).toEqual({
+        expect(createdCourse1).toEqual({
             id: expect.any(Number),
             title: 'NewTitle'
         })
 
         await request(app)
             .get('/courses')
-            .expect(HTTP_STATUSES.OK_200, [createdCourse])
+            .expect(HTTP_STATUSES.OK_200, [createdCourse1])})
+
+    let createdCourse2:any = null;
+
+    it('create one more course', async () => {
+        const createResponse = await request(app)
+            .post('/courses')
+            .send({title: 'it-incubator cc2'})
+            .expect(HTTP_STATUSES.CREATED_201)
+
+        createdCourse2 = createResponse.body;
+
+        expect(createdCourse2).toEqual({
+            id: expect.any(Number),
+            title: 'it-incubator cc2'
+        })
+
+        await request(app)
+            .get('/courses')
+            .expect(HTTP_STATUSES.OK_200, [createdCourse1, createdCourse2])
     })
+
+
 
     it('should NOT update course with incorrect input data', async () => {
        await request(app)
-            .put('/courses/' + createdCourse.id)
+            .put('/courses/' + createdCourse1.id)
             .send({title: ''})
             .expect(HTTP_STATUSES.BAD_REQUEST_400)
 
         await request(app)
             .get('/courses')
-            .expect(HTTP_STATUSES.OK_200, createdCourse)
+            .expect(HTTP_STATUSES.OK_200, createdCourse1)
     })
 
     it('should NOT update course that not exist', async () => {
@@ -72,16 +94,45 @@ describe('/course', () => {
 
     it('should update course with correct input data', async () => {
         await request(app)
-            .put('/courses/' + createdCourse.id)
+            .put('/courses/' + createdCourse1.id)
             .send({title: 'good new title'})
             .expect(HTTP_STATUSES.NO_CONTENT_204)
 
         await request(app)
-            .get('/courses' + createdCourse.id)
+            .get('/courses/' + createdCourse1.id)
             .expect(HTTP_STATUSES.OK_200, {
-                ...createdCourse,
+                ...createdCourse1,
             title: 'good new title'})
+
+        await request(app)
+            .get('/courses/' + createdCourse1.id)
+            .expect(HTTP_STATUSES.OK_200, createdCourse2)
+
     })
+
+    it('should delete both courses', async () => {
+        await request(app)
+            .delete('/courses/' + createdCourse1.id)
+            .expect(HTTP_STATUSES.NO_CONTENT_204)
+
+        await request(app)
+            .get('/courses' + createdCourse1.id)
+            .expect(HTTP_STATUSES.NOT_FOUND_404)
+
+        await request(app)
+            .delete('/courses/' + createdCourse2.id)
+            .expect(HTTP_STATUSES.NO_CONTENT_204)
+
+        await request(app)
+            .get('/courses' + createdCourse2.id)
+            .expect(HTTP_STATUSES.NOT_FOUND_404)
+
+        await request(app)
+            .get('/courses')
+            .expect(HTTP_STATUSES.OK_200, [])
+
+    })
+
 
 
 

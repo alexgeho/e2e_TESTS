@@ -58,9 +58,19 @@ app.put('/courses/:id', (req: Request, res: Response) => {
     if (!foundCourse) {
         return res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
     }
+
+    // Валидация title
+    if (
+        typeof req.body.title !== 'string' ||
+        req.body.title.trim().length === 0
+    ) {
+        return res.sendStatus(HTTP_STATUSES.BAD_REQUEST_400);
+    }
+
     foundCourse.title = req.body.title;
     res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
 });
+
 
 
 app.delete('/__test__/data', (req: Request, res: Response) => {
