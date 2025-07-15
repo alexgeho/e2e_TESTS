@@ -26,12 +26,19 @@ export const db = {
 
 app.get('/courses', (req: Request, res: Response) => {
     let foundCourses = db.courses;
-    if (req.query.title) {
-        foundCourses = foundCourses
-            .filter(c => c.title.indexOf(req.query.title as string) > -1);
-    }
+
     res.json(foundCourses);
 });
+
+app.get('/courses/:id', (req: Request, res: Response) => {
+    const foundCourse = db.courses.find(course =>course.id === +req.params.id);
+if (!foundCourse) {
+    return res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);}
+
+    res.json(foundCourse);
+
+
+} )
 
 app.post('/courses', (req: Request, res: Response) => {
     if (!req.body.title) {

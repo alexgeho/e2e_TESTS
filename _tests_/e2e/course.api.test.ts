@@ -4,9 +4,10 @@ import {app, HTTP_STATUSES} from '../../src/index';
 
 describe('/course', () => {
 
-    beforeAll(async () => {
+    beforeEach(async () => {
         await request(app).delete('/__test__/data')
     })
+
 
     it('should return 200 and empty array', async () => {
         await request(app)
@@ -55,6 +56,13 @@ describe('/course', () => {
     let createdCourse2:any = null;
 
     it('create one more course', async () => {
+
+        const createResponse1 = await request(app)
+            .post('/courses')
+            .send({title: 'NewTitle'})
+            .expect(HTTP_STATUSES.CREATED_201);
+        const createdCourse1 = createResponse1.body;
+
         const createResponse = await request(app)
             .post('/courses')
             .send({title: 'it-incubator cc2'})
@@ -75,13 +83,21 @@ describe('/course', () => {
 
 
     it('should NOT update course with incorrect input data', async () => {
-       await request(app)
+
+        const createResponse = await request(app)
+            .post('/courses')
+            .send({title: 'it-incubator cc2'})
+            .expect(HTTP_STATUSES.CREATED_201)
+
+        createdCourse1 = createResponse.body;
+
+        await request(app)
             .put('/courses/' + createdCourse1.id)
             .send({title: ''})
             .expect(HTTP_STATUSES.BAD_REQUEST_400)
 
         await request(app)
-            .get('/courses')
+            .get('/courses/'+ createdCourse1.id)
             .expect(HTTP_STATUSES.OK_200, createdCourse1)
     })
 
@@ -99,42 +115,58 @@ describe('/course', () => {
         const createResponse = await request(app)
             .post('/courses/')
             .send({title: 'good title3'})
-            .expect(HTTP_STATUSES.CREATED_201)
+            .expect(HTTP_STATUSES.CREATED_201);
 
         createdCourse3 = createResponse.body;
 
         await request(app)
             .put('/courses/' + createdCourse3.id)
             .send({title: 'good new title'})
-            .expect(HTTP_STATUSES.NO_CONTENT_204)
+            .expect(HTTP_STATUSES.NO_CONTENT_204);
 
         await request(app)
             .get('/courses/' + createdCourse3.id)
             .expect(HTTP_STATUSES.OK_200, {
-                ...createdCourse3,
-            title: 'good new title'})
+                id: createdCourse3.id,
+                title: 'good new title'
+            });
+    });
 
-        await request(app)
-            .get('/courses/' + createdCourse3.id)
-            .expect(HTTP_STATUSES.OK_200, createdCourse2)
 
-    })
+    let createdCourse5:any = null;
+    let createdCourse4:any = null;
+
 
     it('should delete both courses', async () => {
+
+        const createResponse = await request(app)
+            .post('/courses')
+            .send({title: 'NewTitle'})
+            .expect(HTTP_STATUSES.CREATED_201)
+
+        createdCourse5 = createResponse.body;
+
+        const createResponse2 = await request(app)
+            .post('/courses')
+            .send({title: 'it-incubator cc2'})
+            .expect(HTTP_STATUSES.CREATED_201)
+
+        createdCourse4 = createResponse2.body;
+
         await request(app)
-            .delete('/courses/' + createdCourse1.id)
+            .delete('/courses/' + createdCourse5.id)
             .expect(HTTP_STATUSES.NO_CONTENT_204)
 
         await request(app)
-            .get('/courses' + createdCourse1.id)
+            .get('/courses/' + createdCourse5.id)
             .expect(HTTP_STATUSES.NOT_FOUND_404)
 
         await request(app)
-            .delete('/courses/' + createdCourse2.id)
+            .delete('/courses/' + createdCourse4.id)
             .expect(HTTP_STATUSES.NO_CONTENT_204)
 
         await request(app)
-            .get('/courses' + createdCourse2.id)
+            .get('/courses/' + createdCourse4.id)
             .expect(HTTP_STATUSES.NOT_FOUND_404)
 
         await request(app)
