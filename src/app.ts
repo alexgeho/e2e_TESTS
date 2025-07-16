@@ -14,7 +14,7 @@ export const jsonBodyMiddleware = express.json();
 
 app.use(jsonBodyMiddleware);
 
-app.use(RouterPaths.courses, getCoursesRouter(db))
+//app.use(RouterPaths.courses, getCoursesRouter(db))
 app.use(RouterPaths.users, getUserRouter(db))
 app.use(RouterPaths.__test__, getTestRouter(db))
 //app.use("/interesting", getInterstingRouter(db))
