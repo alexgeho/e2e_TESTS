@@ -9,8 +9,9 @@ import {UpdateUserModel} from "./models/UpdateUserModel";
 
 type RequestWithBody<T> = Request<{}, {}, T>
 type RequestWithQuery<T> = Request<{}, {}, T>
-type RequestWithParams<T> = Request<{}, {}, T>
-type RequestWithParamsAndBody<T> = Request<{}, {}, T>
+type RequestWithParams<T> = Request<T>
+type RequestWithParamsAndBody<P, B> = Request<P, {}, B>
+
 
 
 
@@ -47,11 +48,12 @@ export const getUsersRouter = (db: DBType): Router => {
 
     router.get('/', (req: RequestWithQuery<QueryUserModel>,
                      res: Response<UserViewModel[]>) => {
-        let foundEntities: UserType = db.users;
+        let foundEntities: UserType [] = db.users;
         if (req.query.userName) {
-            foundEntities = foundEntities
-                .filter(c => c.userName.indexOf(req.query.userName));
+            const userName = req.query.userName as string;
+            foundEntities = foundEntities.filter(c => c.userName.includes(userName));
         }
+
         res.json(foundEntities.map(mapEntityToViewModel));
     })
 
