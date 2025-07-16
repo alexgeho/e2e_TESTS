@@ -1,12 +1,13 @@
-import express, {Router} from "express";
 import {UserType, db, DBType, CourseType} from "../../db/db";
 import {HTTP_STATUSES} from "../../utils";
-import {Request, Response} from "express";
+import express, { Request, Response, Router } from "express"
 import {QueryUserModel} from "./models/QueryUserModel";
 import {UserViewModel} from "./models/UserViewModel";
 import {CreateUserModel} from "./models/CreateUserModel";
 import {URIParamsUserIdModel} from "./models/URIParamsUserIdModel";
 import {UpdateUserModel} from "./models/UpdateUserModel";
+
+type RequestWithBody<T> = Request<{}, {}, T>
 
 export const mapEntityToViewModel = (dbEntity: UserType): UserViewModel => {
     return {
@@ -16,9 +17,9 @@ export const mapEntityToViewModel = (dbEntity: UserType): UserViewModel => {
 }
 
 
-export const getUsersRouter = Router(db: DBType ) =>
-{
-    const router: Router = express.Router()
+
+export const getUsersRouter = (db: DBType): Router => {
+    const router = express.Router()
 
     router.post(
         '/', (req: RequestWithBody<CreateUserModel>,

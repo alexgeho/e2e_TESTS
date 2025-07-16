@@ -3,6 +3,12 @@ export type UserType = {
     userName: string
 }
 
+export type DBType = {
+    courses: CourseType[],
+    users: UserType[],
+    studentCourseBindings: StudentCourseBinding[]
+}
+
 export type CourseType = {
     id: number
     title: string
@@ -14,7 +20,6 @@ export type StudentCourseBinding = {
     courseId: number
     date: Date
 }
-
 
 export const db: DBType = {
     courses: [
@@ -34,8 +39,3 @@ export const db: DBType = {
     ]
 }
 
-// export type DBType = {
-//     courses: CourseType[],
-//     users: UserType[],
-//     studentCourseBindings: StudentCourseBinding[]
-// }

@@ -10,7 +10,7 @@ const getRequest = () => {
 describe('tests for /users', () => {
 
     beforeEach(async () => {
-        await request(app).delete('/__test__/data')
+        await request(app).delete(`${RouterPaths.__test__}/1`)
     })
 
 
