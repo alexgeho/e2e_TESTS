@@ -10,7 +10,7 @@ const getRequest = () => {
 describe('tests for /users', () => {
 
     beforeEach(async () => {
-        await request(app).delete(`${RouterPaths.__test__}/1`)
+        await request(app).delete(`${RouterPaths.__test__}/data`)
     })
 
 
@@ -122,21 +122,21 @@ describe('tests for /users', () => {
     it('should update entity with correct input data', async () => {
         const createResponse = await request(app)
             .post(RouterPaths.users)
-            .send({title: 'good title3'})
+            .send({userName: 'good title3'})
             .expect(HTTP_STATUSES.CREATED_201);
 
         createdEntity3 = createResponse.body;
 
         await request(app)
             .put(`${RouterPaths.users}/${createdEntity3.id}`)
-            .send({title: 'good new title'})
+            .send({userName: 'good new title'})
             .expect(HTTP_STATUSES.NO_CONTENT_204);
 
         await request(app)
             .get(`${RouterPaths.users}/${createdEntity3.id}`)
             .expect(HTTP_STATUSES.OK_200, {
                 id: createdEntity3.id,
-                title: 'good new title'
+                userName: 'good new title'
             });
     });
 
@@ -149,14 +149,14 @@ describe('tests for /users', () => {
 
         const createResponse = await request(app)
             .post(RouterPaths.users)
-            .send({title: 'NewTitle'})
+            .send({userName: 'NewTitle'})
             .expect(HTTP_STATUSES.CREATED_201)
 
         createdCourse5 = createResponse.body;
 
         const createResponse2 = await request(app)
             .post(RouterPaths.users)
-            .send({title: 'it-incubator cc2'})
+            .send({userName: 'it-incubator cc2'})
             .expect(HTTP_STATUSES.CREATED_201)
 
         createdCourse4 = createResponse2.body;
