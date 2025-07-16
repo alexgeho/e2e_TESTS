@@ -8,6 +8,11 @@ import {URIParamsUserIdModel} from "./models/URIParamsUserIdModel";
 import {UpdateUserModel} from "./models/UpdateUserModel";
 
 type RequestWithBody<T> = Request<{}, {}, T>
+type RequestWithQuery<T> = Request<{}, {}, T>
+type RequestWithParams<T> = Request<{}, {}, T>
+type RequestWithParamsAndBody<T> = Request<{}, {}, T>
+
+
 
 export const mapEntityToViewModel = (dbEntity: UserType): UserViewModel => {
     return {
@@ -72,7 +77,7 @@ export const getUsersRouter = (db: DBType): Router => {
         res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
     })
 
-        .router.put('/:id', (req: RequestWithParamsAndBody<URIParamsUserIdModel, UpdateUserModel>,
+        router.put('/:id', (req: RequestWithParamsAndBody<URIParamsUserIdModel, UpdateUserModel>,
                              res) => {
         if (!req.body.userName) {
             res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
