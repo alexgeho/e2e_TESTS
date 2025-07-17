@@ -78,11 +78,10 @@ export const getCoursesRouter = (db: DBType): Router => {
 
         if (findCourse !== -1) {
             db.courses.splice(findCourse, 1);
-
         }
 
 
-        res.json(HTTP_STATUSES.OK_200);
+        res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
     })
 
 
