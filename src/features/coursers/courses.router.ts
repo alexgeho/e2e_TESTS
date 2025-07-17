@@ -23,25 +23,52 @@ export const getCoursesRouter = (db: DBType): Router => {
     router.get('/:id', (req: Request, res: Response) => {
         const id = +req.params.id;
         const courseId = db.courses.find((course) => course.id === id);
+
+        if (!courseId) {
+            res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
+        }
         res.json(courseId);
     })
 
+
     router.post('/', (req: Request, res: Response) => {
-        const courseNew = req.body;
+        let courseNew = req.body;
+
+        if (!req.body.title || typeof req.body.title !== "string" ) {
+            res.sendStatus(HTTP_STATUSES.BAD_REQUEST_400);
+            return
+        }
+
+        courseNew = {
+            id: +(new Date()),
+            title: req.body.title
+        }
+
         db.courses.push(courseNew);
-        res.json(courseNew);
+
+        res.status(HTTP_STATUSES.CREATED_201).json(courseNew);
     })
+
+
 
     router.put('/:id', (req: Request, res: Response) => {
         const id = +req.params.id;
-        let courseId = db.courses.find((course) => course.id === id);
+        const course = db.courses.find(c => c.id === id);
 
-        if (courseId) {
-            courseId.title = req.body.title;
-            courseId.studentsCount = req.body.studentsCount;
+        if (!course) {
+            res.sendStatus(404);
+            return;
         }
 
-        res.json(courseId);
+        if (typeof req.body.title !== 'string' || !req.body.title.trim()) {
+            res.sendStatus(400);
+            return;
+        }
+
+        course.title = req.body.title;
+        course.studentsCount = req.body.studentsCount;
+        res.json(course);
+
     })
 
     router.delete ('/:id', (req: Request, res: Response) => {

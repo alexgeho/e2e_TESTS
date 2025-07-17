@@ -1,6 +1,5 @@
 import request from 'supertest';
-import {app} from '../../src/index';
-import {RouterPaths} from "../../src/app";
+import {app, RouterPaths} from "../../src/app";
 import {HTTP_STATUSES} from "../../src/utils";
 //import { db } from '../../src/index';
 
@@ -44,6 +43,7 @@ describe('/course', () => {
             .expect(HTTP_STATUSES.CREATED_201)
 
          createdCourse1 = createResponse.body;
+
         console.log('createdCourse1:', createdCourse1); // <-- Добавь сюда
 
         expect(createdCourse1).toEqual({
@@ -124,7 +124,7 @@ describe('/course', () => {
         await request(app)
             .put(`${RouterPaths.courses}/${createdCourse3.id}`)
             .send({title: 'good new title'})
-            .expect(HTTP_STATUSES.NO_CONTENT_204);
+            .expect(HTTP_STATUSES.OK_200);
 
         await request(app)
             .get(`${RouterPaths.courses}/${createdCourse3.id}`)

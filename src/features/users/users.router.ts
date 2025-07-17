@@ -83,7 +83,6 @@ export const getUsersRouter = (db: DBType): Router => {
             return
         }
 
-
         const foundUser = db.users.find(c => c.id === +req.params.id);
 
         if (!foundUser) {
