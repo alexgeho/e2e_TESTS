@@ -73,12 +73,10 @@ describe('/course', () => {
 
     it('should NOT update course with incorrect input data', async () => {
 
-        const createResponse = await request(app)
-            .post(RouterPaths.courses)
-            .send({title: 'it-incubator cc2'})
-            .expect(HTTP_STATUSES.CREATED_201)
+        const data: CreateCourseModel = {title: 'NewCourse'}
+        const result = await coursesTestManager.createCourse(data)
 
-        createdCourse1 = createResponse.body;
+        createdCourse1 = result.createdEntity;
 
         await request(app)
             .put(`${RouterPaths.courses}/${createdCourse1.id}`)
