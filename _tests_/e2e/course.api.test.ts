@@ -24,10 +24,9 @@ describe('/course', () => {
     })
 
     it('should NOT create course with incorrect input data', async () => {
-        await request(app)
-            .post(RouterPaths.courses)
-            .send({title: ''})
-            .expect(HTTP_STATUSES.BAD_REQUEST_400)
+
+        await coursesTestManager.createCourse({title: ''}, HTTP_STATUSES.BAD_REQUEST_400)
+
 
         await request(app)
             .get(RouterPaths.courses)
@@ -45,25 +44,21 @@ describe('/course', () => {
         console.log('createdCourse1:', createdCourse1); // <-- Добавь сюда
 
 
-
     })
 
     let createdCourse2: any = null;
 
     it('create one more course', async () => {
 
-        const createResponse1 = await request(app)
-            .post(RouterPaths.courses)
-            .send({title: 'NewTitle'})
-            .expect(HTTP_STATUSES.CREATED_201);
-        const createdCourse1 = createResponse1.body;
+        const data1: CreateCourseModel = {title: 'NewTitle'}
+        const data2: CreateCourseModel = {title: 'it-incubator cc2'}
 
-        const createResponse = await request(app)
-            .post(RouterPaths.courses)
-            .send({title: 'it-incubator cc2'})
-            .expect(HTTP_STATUSES.CREATED_201)
+        const {createdEntity: fromData1} = await coursesTestManager.createCourse(data1)
+        const createdCourse1 = fromData1;
 
-        createdCourse2 = createResponse.body;
+        const {createdEntity: fromData2} = await coursesTestManager.createCourse(data2)
+        createdCourse2 = fromData2;
+
 
         expect(createdCourse2).toEqual({
             id: expect.any(Number),
