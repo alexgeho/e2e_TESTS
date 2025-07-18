@@ -1,7 +1,8 @@
 import request from 'supertest';
 import {app, RouterPaths} from "../../src/app";
 import {HTTP_STATUSES} from "../../src/utils";
-//import { db } from '../../src/index';
+import {CreateCourseModel} from "../../src/features/coursers/models/CreateCourseModel";
+import {coursesTestManager} from "../e2e/utils/coursesTestManager";
 
 describe('/course', () => {
 
@@ -33,29 +34,21 @@ describe('/course', () => {
             .expect(HTTP_STATUSES.OK_200, [])
 
     })
-
-    let createdCourse1:any = null;
+    const data: CreateCourseModel = {title: 'NewTitle'}
+    let createdCourse1: any = null;
 
     it('should create course with correct input data', async () => {
-        const createResponse = await request(app)
-            .post(RouterPaths.courses)
-            .send({title: 'NewTitle'})
-            .expect(HTTP_STATUSES.CREATED_201)
+        const {createdEntity} = await coursesTestManager.createCourse(data)
 
-         createdCourse1 = createResponse.body;
+        createdCourse1 = createdEntity;
 
         console.log('createdCourse1:', createdCourse1); // <-- Добавь сюда
 
-        expect(createdCourse1).toEqual({
-            id: expect.any(Number),
-            title: 'NewTitle'
-        })
 
-        await request(app)
-            .get(RouterPaths.courses)
-            .expect(HTTP_STATUSES.OK_200, [createdCourse1])})
 
-    let createdCourse2:any = null;
+    })
+
+    let createdCourse2: any = null;
 
     it('create one more course', async () => {
 
@@ -81,7 +74,6 @@ describe('/course', () => {
             .get(RouterPaths.courses)
             .expect(HTTP_STATUSES.OK_200, [createdCourse1, createdCourse2])
     })
-
 
 
     it('should NOT update course with incorrect input data', async () => {
@@ -111,7 +103,7 @@ describe('/course', () => {
     })
 
 
-    let createdCourse3:any = null;
+    let createdCourse3: any = null;
 
     it('should update course with correct input data', async () => {
         const createResponse = await request(app)
@@ -135,8 +127,8 @@ describe('/course', () => {
     });
 
 
-    let createdCourse5:any = null;
-    let createdCourse4:any = null;
+    let createdCourse5: any = null;
+    let createdCourse4: any = null;
 
 
     it('should delete both courses', async () => {
@@ -176,8 +168,6 @@ describe('/course', () => {
             .expect(HTTP_STATUSES.OK_200, [])
 
     })
-
-
 
 
 })
