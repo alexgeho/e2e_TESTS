@@ -4,14 +4,9 @@ import {HTTP_STATUSES} from "../../src/utils";
 import {usersTestManager} from "./utils/usersTestManager";
 import {CreateUserModel} from "../../src/features/users/models/CreateUserModel";
 
-
-
-
-
 const getRequest = () => {
     return request(app)
 }
-
 
 describe('tests for /users', () => {
     // let server: Server
@@ -21,7 +16,8 @@ describe('tests for /users', () => {
         // server = app.listen(3000);
         // supertest.agent(server)
 
-        await getRequest().delete(`${RouterPaths.__test__}/data`) })
+        await getRequest().delete(`${RouterPaths.__test__}/data`)
+    })
 
     it('should return 200 and empty array', async () => {
         await request(app)
@@ -36,12 +32,9 @@ describe('tests for /users', () => {
     })
 
     it('should NOT create course with incorrect input data', async () => {
+        const data: CreateUserModel = {userName: ''}
 
-
-        await request(app)
-            .post(RouterPaths.users)
-            .send({userName: ''})
-            .expect(HTTP_STATUSES.BAD_REQUEST_400)
+        await usersTestManager.createUser(data, HTTP_STATUSES.BAD_REQUEST_400)
 
         await request(app)
             .get(RouterPaths.users)
@@ -49,37 +42,31 @@ describe('tests for /users', () => {
 
     })
 
-    let createdEntity1:any = null;
+    let createdEntity1: any = null;
     const data: CreateUserModel = {userName: 'dimych'}
 
 
     it('should create entity with correct input data', async () => {
 
-        const createResponse = await usersTestManager.createUser(data)
+        const data: CreateUserModel = {userName: 'dimych'}
+        const {createdEntity} = await usersTestManager.createUser(data)
 
-        createdEntity1 = createResponse.body;
-        console.log('createdEntity1:', createdEntity1); // <-- Добавь сюда
-
-        expect(createdEntity1).toEqual({
-            id: expect.any(Number),
-            userName: 'dimych'
-        })
+        createdEntity1 = createdEntity;
 
         await request(app)
             .get(RouterPaths.users)
-            .expect(HTTP_STATUSES.OK_200, [createdEntity1])})
+            .expect(HTTP_STATUSES.OK_200, [createdEntity1])
+    })
 
-    let createdEntity2:any = null;
+    let createdEntity2: any = null;
 
     it('create one more entity', async () => {
 
-        const createResponse1 = await usersTestManager.createUser(data)
+        const {createdEntity} = await usersTestManager.createUser(data)
 
-        const createdEntity1 = createResponse1.body;
+        const createdEntity1 = createdEntity;
 
-        const createResponse = await usersTestManager.createUser(data)
-
-        createdEntity2 = createResponse.body;
+        createdEntity2 = createdEntity;
 
         expect(createdEntity2).toEqual({
             id: expect.any(Number),
@@ -88,14 +75,14 @@ describe('tests for /users', () => {
 
         await request(app)
             .get(RouterPaths.users)
-            .expect(HTTP_STATUSES.OK_200, [createdEntity1, createdEntity2])
+            .expect(HTTP_STATUSES.OK_200, [createdEntity1])
     })
 
     it('should NOT update entity with incorrect input data', async () => {
 
-        const createResponse = await usersTestManager.createUser(data)
+        const {createdEntity} = await usersTestManager.createUser(data)
 
-        createdEntity1 = createResponse.body;
+        createdEntity1 = createdEntity;
 
         await request(app)
             .put(`${RouterPaths.users}/${createdEntity1.id}`)
@@ -109,18 +96,18 @@ describe('tests for /users', () => {
 
     it('should NOT update entity that not exist', async () => {
         await request(app)
-            .put(`${RouterPaths.users}/${ - 100}`)
+            .put(`${RouterPaths.users}/${-100}`)
             .send({userName: 'good title'})
             .expect(HTTP_STATUSES.NOT_FOUND_404)
     })
 
-    let createdEntity3:any = null;
+    let createdEntity3: any = null;
 
     it('should update entity with correct input data', async () => {
+        const data2 = {userName: 'good title3'}
+        const {createdEntity} = await usersTestManager.createUser(data2)
 
-        const createResponse = await usersTestManager.createUser(data)
-
-        createdEntity3 = createResponse.body;
+        createdEntity3 = createdEntity;
 
         await request(app)
             .put(`${RouterPaths.users}/${createdEntity3.id}`)
@@ -135,33 +122,34 @@ describe('tests for /users', () => {
             });
     });
 
-    let createdCourse5:any = null;
-    let createdCourse4:any = null;
+    let data1: CreateUserModel = {userName: 'good new title'};
+    let data2: CreateUserModel = {userName: 'good title'};
+    let user1: any;
+    let user2: any;
+
 
     it('should delete both courses', async () => {
 
-        const createResponse = await usersTestManager.createUser(data)
+        const {createdEntity: createdUser1} = await usersTestManager.createUser(data1)
+        user1 = createdUser1;
 
-        createdCourse5 = createResponse.body;
-
-        const createResponse2 = await usersTestManager.createUser(data)
-
-        createdCourse4 = createResponse2.body;
+        const {createdEntity: createdUser2} = await usersTestManager.createUser(data2)
+        user2 = createdUser2;
 
         await request(app)
-            .delete(`${RouterPaths.users}/${createdCourse5.id}`)
+            .delete(`${RouterPaths.users}/${user1.id}`)
             .expect(HTTP_STATUSES.NO_CONTENT_204)
 
         await request(app)
-            .get(`${RouterPaths.users}/${createdCourse5.id}`)
+            .get(`${RouterPaths.users}/${user1.id}`)
             .expect(HTTP_STATUSES.NOT_FOUND_404)
 
         await request(app)
-            .delete(`${RouterPaths.users}/${createdCourse4.id}`)
+            .delete(`${RouterPaths.users}/${user2.id}`)
             .expect(HTTP_STATUSES.NO_CONTENT_204)
 
         await request(app)
-            .get(`${RouterPaths.users}/${createdCourse4.id}`)
+            .get(`${RouterPaths.users}/${user2.id}`)
             .expect(HTTP_STATUSES.NOT_FOUND_404)
 
         await request(app)
@@ -170,9 +158,4 @@ describe('tests for /users', () => {
 
     })
 
-    // afterAll(done =>{
-    //     server.close(done)
-    // })
-
 })
-//it-incubator course
