@@ -1,19 +1,27 @@
 import request from 'supertest';
 import {app, RouterPaths} from "../../src/app";
 import {HTTP_STATUSES} from "../../src/utils";
+import {usersTestManager} from "./usersTestManager";
 import {CreateUserModel} from "../../src/features/users/models/CreateUserModel";
+
+
+
+
 
 const getRequest = () => {
     return request(app)
 }
 
+
 describe('tests for /users', () => {
+    // let server: Server
 
     beforeEach(async () => {
-        await request(app).delete(`${RouterPaths.__test__}/data`)
-    })
 
+        // server = app.listen(3000);
+        // supertest.agent(server)
 
+        await getRequest().delete(`${RouterPaths.__test__}/data`) })
 
     it('should return 200 and empty array', async () => {
         await request(app)
@@ -42,19 +50,19 @@ describe('tests for /users', () => {
     })
 
     let createdEntity1:any = null;
+    const data: CreateUserModel = {userName: 'dimych'}
+
 
     it('should create entity with correct input data', async () => {
-        const createResponse = await request(app)
-            .post(RouterPaths.users)
-            .send({userName: 'NewTitle'})
-            .expect(HTTP_STATUSES.CREATED_201)
+
+        const createResponse = await usersTestManager.createUser(data)
 
         createdEntity1 = createResponse.body;
         console.log('createdEntity1:', createdEntity1); // <-- Добавь сюда
 
         expect(createdEntity1).toEqual({
             id: expect.any(Number),
-            userName: 'NewTitle'
+            userName: 'dimych'
         })
 
         await request(app)
@@ -65,22 +73,17 @@ describe('tests for /users', () => {
 
     it('create one more entity', async () => {
 
-        const createResponse1 = await request(app)
-            .post(RouterPaths.users)
-            .send({userName: 'NewTitle'})
-            .expect(HTTP_STATUSES.CREATED_201);
+        const createResponse1 = await usersTestManager.createUser(data)
+
         const createdEntity1 = createResponse1.body;
 
-        const createResponse = await request(app)
-            .post(RouterPaths.users)
-            .send({userName: 'it-incubator cc2'})
-            .expect(HTTP_STATUSES.CREATED_201)
+        const createResponse = await usersTestManager.createUser(data)
 
         createdEntity2 = createResponse.body;
 
         expect(createdEntity2).toEqual({
             id: expect.any(Number),
-            userName: 'it-incubator cc2'
+            userName: 'dimych'
         })
 
         await request(app)
@@ -88,14 +91,9 @@ describe('tests for /users', () => {
             .expect(HTTP_STATUSES.OK_200, [createdEntity1, createdEntity2])
     })
 
-
-
     it('should NOT update entity with incorrect input data', async () => {
 
-        const createResponse = await request(app)
-            .post(RouterPaths.users)
-            .send({userName: 'it-incubator cc2'})
-            .expect(HTTP_STATUSES.CREATED_201)
+        const createResponse = await usersTestManager.createUser(data)
 
         createdEntity1 = createResponse.body;
 
@@ -116,14 +114,11 @@ describe('tests for /users', () => {
             .expect(HTTP_STATUSES.NOT_FOUND_404)
     })
 
-
     let createdEntity3:any = null;
 
     it('should update entity with correct input data', async () => {
-        const createResponse = await request(app)
-            .post(RouterPaths.users)
-            .send({userName: 'good title3'})
-            .expect(HTTP_STATUSES.CREATED_201);
+
+        const createResponse = await usersTestManager.createUser(data)
 
         createdEntity3 = createResponse.body;
 
@@ -140,24 +135,16 @@ describe('tests for /users', () => {
             });
     });
 
-
     let createdCourse5:any = null;
     let createdCourse4:any = null;
 
-
     it('should delete both courses', async () => {
 
-        const createResponse = await request(app)
-            .post(RouterPaths.users)
-            .send({userName: 'NewTitle'})
-            .expect(HTTP_STATUSES.CREATED_201)
+        const createResponse = await usersTestManager.createUser(data)
 
         createdCourse5 = createResponse.body;
 
-        const createResponse2 = await request(app)
-            .post(RouterPaths.users)
-            .send({userName: 'it-incubator cc2'})
-            .expect(HTTP_STATUSES.CREATED_201)
+        const createResponse2 = await usersTestManager.createUser(data)
 
         createdCourse4 = createResponse2.body;
 
@@ -183,8 +170,9 @@ describe('tests for /users', () => {
 
     })
 
-
-
+    // afterAll(done =>{
+    //     server.close(done)
+    // })
 
 })
 //it-incubator course
