@@ -1,4 +1,4 @@
-import {UserType, db, DBType, CourseType} from "../../db/db";
+import {UserType, DBType} from "../../db/db";
 import {HTTP_STATUSES} from "../../utils";
 import express, {Request, Response, Router} from "express"
 import {QueryUserModel} from "./models/QueryUserModel";
